@@ -5,11 +5,14 @@ export type AuthDocument = Auth & Document;
 
 @Schema()
 export class Auth {
-	@Prop()
-	id: string;
+  @Prop()
+  email: string;
 
-	@Prop()
-	jwt: string;
+  @Prop()
+  password: string;
+
+  @Prop()
+  role: string;
 }
 
 export const AuthSchema = SchemaFactory.createForClass(Auth);

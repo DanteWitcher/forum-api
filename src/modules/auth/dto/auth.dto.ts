@@ -1,4 +1,4 @@
 export class AuthDto {
-	readonly email: string;
-	readonly password: number;
-  }
+  readonly email: string;
+  readonly password: string;
+}
