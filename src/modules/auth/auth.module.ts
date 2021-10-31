@@ -8,24 +8,26 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { Auth, AuthSchema } from './schemas/auth.schema';
 
+const jwtFactory = {
+  useFactory: async (configService: ConfigService) => {
+    const signature = configService.get<string>('SIGN');
+    const expire = configService.get<number>('EXPIRE');
+
+    return {
+      secret: signature,
+      signOptions: {
+        expiresIn: expire,
+      },
+    };
+  },
+  inject: [ConfigService],
+};
+
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Auth.name, schema: AuthSchema }]),
     PassportModule,
-    JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => {
-        const signature = configService.get<string>('SIGN');
-        const expire = configService.get<number>('EXPIRE');
-
-        return {
-          secret: signature,
-          signOptions: {
-            expiresIn: expire,
-          },
-        };
-      },
-      inject: [ConfigService],
-    }),
+    JwtModule.registerAsync(jwtFactory),
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

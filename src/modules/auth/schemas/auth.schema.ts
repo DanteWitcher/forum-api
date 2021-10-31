@@ -5,13 +5,13 @@ export type AuthDocument = Auth & Document;
 
 @Schema()
 export class Auth {
-  @Prop()
+  @Prop({ type: String, required: true })
   email: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   password: string;
 
-  @Prop()
+  @Prop({ type: String, required: true })
   role: string;
 }
 
