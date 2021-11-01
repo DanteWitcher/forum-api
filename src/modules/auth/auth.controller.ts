@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
+
 import { IResponse } from 'src/share/interfaces/response.interface';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
@@ -13,8 +15,8 @@ export class AuthController {
   }
 
   @Post('/login')
-  async login(@Body() authDto: AuthDto): Promise<IResponse> {
-    return this.authService.login(authDto.email, authDto.password);
+  async login(@Body() authDto: AuthDto, @Res() res: Response): Promise<IResponse> {
+    return this.authService.login(authDto.email, authDto.password, res);
   }
 
   @Get()

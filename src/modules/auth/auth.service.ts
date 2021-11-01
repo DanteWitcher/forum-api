@@ -4,11 +4,13 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash, verify } from 'argon2';
-
+import { Response } from 'express';
 import { Model } from 'mongoose';
+
 import { EError } from 'src/share/enums/error.enum';
 import { ERole } from 'src/share/enums/role.enum';
 import { IResponse } from 'src/share/interfaces/response.interface';
@@ -19,6 +21,7 @@ export class AuthService {
   constructor(
     @InjectModel(Auth.name) private readonly authModel: Model<AuthDocument>,
     private readonly jwtService: JwtService,
+	private readonly configService: ConfigService,
   ) {}
 
   async register(email: string, password: string): Promise<IResponse> {
@@ -47,7 +50,7 @@ export class AuthService {
     };
   }
 
-  async login(email: string, password: string): Promise<IResponse> {
+  async login(email: string, password: string, res: Response): Promise<IResponse> {
     const foundUser = await this.authModel.findOne({ email });
 
     if (!foundUser) {
@@ -70,10 +73,18 @@ export class AuthService {
     }
 
     const payload = { email: foundUser.email, role: foundUser.role };
+	const accessToken = this.jwtService.sign(payload);
+    const expire = this.configService.get<number>('EXPIRE');
+
+	res.cookie('accessToken', accessToken, {
+        expires: new Date(new Date().getTime() + expire * 1000),
+        sameSite: 'strict',
+        httpOnly: true,
+      });
 
     return {
       message: `User with email: '${email}' has logged successfully`,
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
     };
   }
 }
