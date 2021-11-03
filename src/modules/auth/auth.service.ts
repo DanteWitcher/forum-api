@@ -21,7 +21,7 @@ export class AuthService {
   constructor(
     @InjectModel(Auth.name) private readonly authModel: Model<AuthDocument>,
     private readonly jwtService: JwtService,
-	private readonly configService: ConfigService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(email: string, password: string): Promise<IResponse> {
@@ -50,7 +50,11 @@ export class AuthService {
     };
   }
 
-  async login(email: string, password: string, res: Response): Promise<IResponse> {
+  async login(
+    email: string,
+    password: string,
+    res: Response,
+  ): Promise<Response<IResponse>> {
     const foundUser = await this.authModel.findOne({ email });
 
     if (!foundUser) {
@@ -72,19 +76,42 @@ export class AuthService {
       );
     }
 
-    const payload = { email: foundUser.email, role: foundUser.role };
-	const accessToken = this.jwtService.sign(payload);
+    return this.generateToken(foundUser, res);
+  }
+
+  async getNewToken(
+    email: string,
+    res: Response,
+  ): Promise<Response<IResponse>> {
+    const foundUser = await this.authModel.findOne({ email });
+
+    if (!foundUser) {
+      throw new UnauthorizedException({
+        message: `User with email: '${email}', hasn't registered`,
+        errCode: EError.USER_NOT_REGISTERED,
+      });
+    }
+
+    return this.generateToken(foundUser, res);
+  }
+
+  private generateToken(
+    user: AuthDocument,
+    res: Response,
+  ): Response<IResponse> {
+    const payload = { email: user.email, role: user.role };
+    const accessToken = this.jwtService.sign(payload);
     const expire = this.configService.get<number>('EXPIRE');
 
-	res.cookie('accessToken', accessToken, {
-        expires: new Date(new Date().getTime() + expire * 1000),
-        sameSite: 'strict',
-        httpOnly: true,
-      });
+    res.cookie('access_token', accessToken, {
+      expires: new Date(new Date().getTime() + expire * 1000),
+      sameSite: 'strict',
+      httpOnly: true,
+    });
 
-    return {
-      message: `User with email: '${email}' has logged successfully`,
+    return res.json({
+      message: `User with email: '${user.email}' has logged successfully`,
       access_token: accessToken,
-    };
+    });
   }
 }

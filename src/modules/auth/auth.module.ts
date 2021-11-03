@@ -11,12 +11,12 @@ import { Auth, AuthSchema } from './schemas/auth.schema';
 const jwtFactory = {
   useFactory: async (configService: ConfigService) => {
     const signature = configService.get<string>('SIGN');
-    const expire = configService.get<number>('EXPIRE');
+    const expire = configService.get<string>('EXPIRE');
 
     return {
       secret: signature,
       signOptions: {
-        expiresIn: expire,
+        expiresIn: Number(expire),
       },
     };
   },
