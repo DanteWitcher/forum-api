@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService, registerAs } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AUTH_CONFIG } from './modules/auth/config';
 import { ProfileModule } from './modules/profile/profile.module';
