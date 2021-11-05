@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-SERVER="my_database_server";
-PW="mysecretpassword";
+SERVER="profile";
+PW="myPassword";
 DB="profile";
 
 echo "echo stop & remove old docker [$SERVER] and starting new fresh instance of [$SERVER]"
-(docker kill $SERVER || :) && \
+  (docker kill $SERVER || :) && \
   (docker rm $SERVER || :) && \
   docker run --name $SERVER -e POSTGRES_PASSWORD=$PW \
   -e PGPASSWORD=$PW \
