@@ -80,7 +80,7 @@ export class AuthService {
   }
 
   async getNewToken(
-    email: string,
+	email: string,
     res: Response,
   ): Promise<Response<IResponse>> {
     const foundUser = await this.authModel.findOne({ email });

@@ -1,21 +1,23 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Get, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Response, Request } from 'express';
 
 import { IResponse } from 'src/share/interfaces/response.interface';
+import { IUser } from 'src/share/interfaces/user.interface';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 
+@UsePipes(new ValidationPipe({ transform: true }))
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/register')
+  @Post('register')
   async register(@Body() authDto: AuthDto): Promise<IResponse> {
     return this.authService.register(authDto.email, authDto.password);
   }
 
-  @Post('/login')
+  @Post('login')
   async login(
     @Body() authDto: AuthDto,
     @Res() res: Response,
@@ -24,12 +26,14 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/get-token')
+  @Post('get-token')
   async getNewToken(
-    @Body() authDto: AuthDto,
+	@Req() req: Request,
     @Res() res: Response,
   ): Promise<Response<IResponse>> {
-    return this.authService.getNewToken(authDto.email, res);
+	const user = <IUser>req.user;
+
+    return this.authService.getNewToken(user.email, res);
   }
 
   @Get()

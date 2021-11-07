@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProfileService } from './profile/profile.service';
-import { ProfileController } from './profile/profile.controller';
+import { ProfileService } from './profile.service';
+import { ProfileController } from './profile.controller';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import { ProfileEntity } from './model/profile.entity';
 
 
 const postgresConfig = {
     useFactory: async (configService: ConfigService) => {
-        return {
+        return <PostgresConnectionOptions>{
 			type: 'postgres',
 
             host: configService.get<string>('POSTGRES_HOST'),
@@ -15,25 +17,26 @@ const postgresConfig = {
             username: configService.get<string>('POSTGRES_USER'),
             password: configService.get<string>('POSTGRES_PASSWORD'),
             database: configService.get<string>('POSTGRES_DATABASE'),
+			autoLoadEntities: true,
+			synchronize: true,
+			// TODO: check it 
+			// entities: ['**/*.entity{.ts,.js}'],
 
-			entities: ['**/*.entity{.ts,.js}'],
+			// migrationsTableName: 'migration',
 
-			migrationsTableName: 'migration',
-
-			migrations: ['src/migration/*.ts'],
-
-			cli: {
-				migrationsDir: 'src/migration',
-			},
-
-			ssl: this.isProduction(),
+			// migrations: ['src/migration/*.ts'],
+			// cli: { migrationsDir: 'src/migration' },
+			// ssl: false,
         };
     },
     inject: [ConfigService],
 }
 
 @Module({
-	imports: [TypeOrmModule.forRootAsync(postgresConfig)],
+	imports: [
+		TypeOrmModule.forRootAsync(postgresConfig),
+		TypeOrmModule.forFeature([ProfileEntity]),
+	],
 	providers: [ProfileService],
 	controllers: [ProfileController],
 })

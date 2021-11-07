@@ -4,7 +4,7 @@ import { EError } from 'src/share/enums/error.enum';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  handleRequest(err, user, info) {
+  handleRequest<IUser>(err, user: IUser, info): IUser {
     if (info?.name === 'TokenExpiredError') {
       throw new UnauthorizedException({
         message: `Token was expired`,
