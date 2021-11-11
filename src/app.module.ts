@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AUTH_CONFIG } from './modules/auth/config';
+import { FilesModule } from './modules/files/files.module';
 import { ProfileModule } from './modules/profile/profile.module';
 
-const modules = [AuthModule, ProfileModule];
+const modules = [AuthModule, ProfileModule, FilesModule];
 
 const authConfig = registerAs('authConfig', () => AUTH_CONFIG);
 
