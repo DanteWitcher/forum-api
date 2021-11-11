@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Dropbox } from 'dropbox';
-import { readFile } from 'fs';
 import { IResponse } from 'src/share/interfaces/response.interface';
 
 @Injectable()
@@ -17,14 +16,17 @@ export class FilesService {
 	}
 
 	async uploadFile(name: string, contents: Buffer): Promise<IResponse> {
-		const path = `${this.dropboxPath}${name}`;
+		try {
+			const path = `${this.dropboxPath}${name}`;
+			await this.dropbox.filesUpload({ path, contents});
+			const { result } = await this.dropbox.sharingCreateSharedLinkWithSettings({ path });
 
-		await this.dropbox.filesUpload({ path, contents});
-		const { result } = await this.dropbox.sharingCreateSharedLinkWithSettings({ path });
-
-		return {
-			message: `File ${name} was uploaded`,
-			data: result?.url,
+			return {
+				message: `File ${name} was uploaded`,
+				data: result?.url,
+			}
+		} catch(err) {
+			throw err;
 		}
 	}
 }
