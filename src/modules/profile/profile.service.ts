@@ -82,15 +82,6 @@ export class ProfileService {
 	async getProfile(user: IUser): Promise<ProfileEntity> {
 		const profile = await this.profileRepository.findOne({ where: { email: user.email }});
 
-		if (!profile) {
-			throw new HttpException({
-			        message: `Profile for '${user.email}' is not created`,
-			        errCode: EError.PROFILE_NOT_CREATED,
-			    },
-			    HttpStatus.BAD_REQUEST,
-			);
-		}
-
 		return profile;
 	}
 

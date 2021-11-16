@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsPhoneNumber, IsUrl, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsPhoneNumber, IsUrl, IsOptional, IsUUID, ValidateIf } from 'class-validator';
 
 export class ProfileDto {
   @IsUUID()
@@ -22,10 +22,12 @@ export class ProfileDto {
   readonly lastName: string;
 
   @IsPhoneNumber()
+  @ValidateIf((req: ProfileDto) => req.phone !== '') 
   @IsOptional()
   readonly phone: string;
 
   @IsUrl()
+  @ValidateIf((req: ProfileDto) => req.photoUrl !== '') 
   @IsOptional()
   readonly photoUrl: string;
 }
