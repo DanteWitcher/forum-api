@@ -10,10 +10,10 @@ export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('upload')
+	@Post('upload-profile-photo')
 	@UseInterceptors(FileInterceptor('file'))
-	async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<IResponse> {
-		return this.filesService.uploadFile(file.originalname, file.buffer);
+	async uploadProfilePhoto(@UploadedFile() file: Express.Multer.File): Promise<IResponse> {
+		return this.filesService.uploadProfilePhoto(file.originalname, file.buffer);
 	}
 
 	@Get('check')

@@ -34,7 +34,9 @@ export class ProfileService {
 		    )
 		}
 
-		await this.checkNickName(profileDto.nickName);
+		if (profileDto.nickName !== profile.nickName) {
+			await this.checkNickName(profileDto.nickName);
+		}
 
 		const newProfile = {
 			...profileDto,
@@ -92,7 +94,7 @@ export class ProfileService {
 	    const [result, total] = await this.profileRepository.findAndCount({
 	        take: take,
 	        skip: skip,
-	        where: { name: Like('%' + keyword + '%') },
+	        where: { nickName: Like('%' + keyword + '%') },
 	    });
 
 	    return {
