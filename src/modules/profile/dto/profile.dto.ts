@@ -2,6 +2,7 @@ import { IsString, IsNotEmpty, IsPhoneNumber, IsUrl, IsOptional, IsUUID, Validat
 
 export class ProfileDto {
   @IsUUID()
+  @ValidateIf((req: ProfileDto) => req.id !== '')
   @IsOptional()
   readonly id: string;
 
@@ -22,12 +23,12 @@ export class ProfileDto {
   readonly lastName: string;
 
   @IsPhoneNumber()
-  @ValidateIf((req: ProfileDto) => req.phone !== '') 
+  @ValidateIf((req: ProfileDto) => req.phone !== '')
   @IsOptional()
   readonly phone: string;
 
   @IsUrl()
-  @ValidateIf((req: ProfileDto) => req.photoUrl !== '') 
+  @ValidateIf((req: ProfileDto) => req.photoUrl !== '')
   @IsOptional()
   readonly photoUrl: string;
 }

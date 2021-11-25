@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { Request } from "express";
 
 import { JwtAuthGuard } from "src/modules/auth/jwt/jwt-auth.guard";
@@ -16,9 +16,12 @@ export class ProfileController {
 	@UseGuards(JwtAuthGuard)
 	@Post('check-name')
 	checkNickName(
-		@Param() nickName: string,
+		@Req() req: Request,
+		@Body('nickName') nickName,
 	) {
-		return this.profileService.checkNickName(nickName);
+		const user = <IUser>req.user;
+
+		return this.profileService.checkNickName(nickName, user.email);
 	}
 
 	@UseGuards(JwtAuthGuard)

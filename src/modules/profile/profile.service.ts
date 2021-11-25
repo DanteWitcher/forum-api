@@ -34,9 +34,7 @@ export class ProfileService {
 		    )
 		}
 
-		if (profileDto.nickName !== profile.nickName) {
-			await this.checkNickName(profileDto.nickName);
-		}
+		await this.checkNickName(profileDto.nickName, profile.email);
 
 		const newProfile = {
 			...profileDto,
@@ -52,17 +50,18 @@ export class ProfileService {
 		return this.profileRepository.findOne(newProfile.id);
 	}
 
-	async checkNickName(nickName: string): Promise<IResponse> {
-		const profile = await this.profileRepository.findOne({ where: { nickName }});
+	async checkNickName(newNickName: string, email: string): Promise<IResponse> {
+		const { nickName: oldNickName } = await this.profileRepository.findOne({ where: { email }});
+		const profileByNickName = await this.profileRepository.findOne({ where: { nickName: newNickName }});
 
-		if (!profile) {
+		if (!profileByNickName || oldNickName === newNickName) {
 			return {
-				message: `You can use this NickName: ${nickName}`,
+				message: `You can use this NickName: ${newNickName}`,
 			};
 		}
 	
 		throw new HttpException({
-		        message: `NickName ${nickName} already exist`,
+		        message: `NickName ${newNickName} already exist`,
 		        errCode: EError.NICKNAME_EXIST,
 		    },
 		    HttpStatus.BAD_REQUEST,
@@ -70,12 +69,17 @@ export class ProfileService {
 	}
 
 	async createProfile(user: IUser, profileDto: ProfileDto): Promise<ProfileEntity> {
-		await this.checkNickName(profileDto.nickName);
+		await this.checkNickName(profileDto.nickName, user.email);
 
 		const newProfile = await this.profileRepository.create(<ProfileEntity>{
 			email: user.email,
 			role: user.role,
-			...profileDto,
+			nickName: profileDto.nickName,
+			firstName: profileDto.firstName,
+			middleName: profileDto.middleName,
+			lastName: profileDto.lastName,
+			phone: profileDto.phone,
+			photoUrl: profileDto.photoUrl,
 		});
 
 		return this.profileRepository.save(newProfile);
