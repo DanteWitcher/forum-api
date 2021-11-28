@@ -51,10 +51,10 @@ export class ProfileService {
 	}
 
 	async checkNickName(newNickName: string, email: string): Promise<IResponse> {
-		const { nickName: oldNickName } = await this.profileRepository.findOne({ where: { email }});
-		const profileByNickName = await this.profileRepository.findOne({ where: { nickName: newNickName }});
+		const profileWithNewNick = await this.profileRepository.findOne({ where: { nickName: newNickName }});
+		const profileWthOldNick = await this.profileRepository.findOne({ where: { email }});
 
-		if (!profileByNickName || oldNickName === newNickName) {
+		if (!profileWithNewNick || (profileWthOldNick && profileWthOldNick.nickName === newNickName)) {
 			return {
 				message: `You can use this NickName: ${newNickName}`,
 			};
